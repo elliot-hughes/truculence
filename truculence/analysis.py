@@ -154,7 +154,8 @@ def print_th2(th2, name, tcanvas):
 			tcanvas.Print("{0}.pdf".format(name), "pdf")
 
 def save_histograms(th1, th2, name):
-	file_name = "{0}.root".format(name)
+	if name[-5:] != ".root":
+		file_name += ".root"
 	if os.path.exists(file_name):
 		tf = TFile(file_name, "RECREATE")
 	else:
