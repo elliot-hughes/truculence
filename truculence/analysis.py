@@ -1,7 +1,9 @@
 import os
 import ROOT
-from ROOT import TFile, TTree, TCanvas, TH1F, TH2F, TGraphErrors
+from ROOT import TFile, TTree, TChain, TCanvas, TH1F, TH2F, TGraphErrors, TList
 from array import array
+from subprocess import Popen, PIPE
+from re import search
 
 # CLASSES:
 class dataset:
@@ -12,6 +14,7 @@ class dataset:
 		info = get_files(name=self.name)
 		self.dir = info["dir"]
 		self.files = info["files"]
+		self.files_full = ["{0}/{1}".format(self.dir, f) for f in self.files]
 	# /Construction
 	
 	# Properties:
@@ -20,10 +23,11 @@ class dataset:
 	# /Properties
 	
 	# Methods:
-#	def get_ttree(self, name=None):
-#		if name == None:
-#			name = self.ttree_name_default
-#		return analysis.get_ttree("{0}/{1}".format(self.directory, self.file), name)
+	def get_nevents(self):
+		n = 0
+		for f in self.files_full:
+			n += get_nevents(f)
+		return n
 	# /Methods
 # /CLASSES
 
@@ -49,7 +53,14 @@ def get_files(name="QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8", username="tote"
 		"dir": ds_dir,
 		"files": files,
 	}
-#	elif dataset == "qcd":
+
+def get_nevents(f=""):
+	raw_output = Popen(['echo "Events->GetEntries()" | root -l {0}'.format(f)], shell = True, stdout = PIPE, stderr = PIPE).communicate()
+	match = search("\(Long64_t\) (\d+)\s", raw_output[0])
+	if match:
+		return int(match.group(1))
+	else:
+		return False
 
 ## ROOT functions:
 def setup_root():
@@ -58,7 +69,7 @@ def setup_root():
 	tcanvas.SetCanvasSize(500, 500)
 	return tcanvas
 
-def get_ttree(full_path, ttree_name):
+def get_ttree(full_path, ttree_name="analyzer/events"):
 	tfile = TFile(full_path)
 	ROOT.SetOwnership(tfile, 0)
 	ttree = TTree()
@@ -66,6 +77,14 @@ def get_ttree(full_path, ttree_name):
 #	ROOT.SetOwnership(ttree, 0)
 #	print ttree
 	return ttree
+
+#def merge_ttrees(list_of_ttrees, ttree_name="T", ttree_title=""):		# This doesn't work because TList takes pointers ...
+#	tl = TList
+#	for tt in list_of_ttrees:
+#		tl.Add(tt)
+#	tt_out = TTree(ttree_name, ttree_title)
+#	tt_out.MergeTrees(tl)
+#	return tt_out
 
 def setup_th1(info):
 	th1 = {}
@@ -153,17 +172,16 @@ def print_th2(th2, name, tcanvas):
 		else:
 			tcanvas.Print("{0}.pdf".format(name), "pdf")
 
-def save_histograms(th1, th2, name):
-	if name[-5:] != ".root":
+def save_histograms(ths, file_name):		# "ths" is a list of th1, th2, etc.
+	if file_name[-5:] != ".root":
 		file_name += ".root"
 	if os.path.exists(file_name):
 		tf = TFile(file_name, "RECREATE")
 	else:
 		tf = TFile(file_name, "NEW")
-	for key, histogram in th1.iteritems():
-		histogram.Write()
-	for key, histogram in th2.iteritems():
-		histogram.Write()
+	for th in ths:
+		for key, histogram in th.iteritems():
+			histogram.Write()
 	tf.Close()
 
 def print_th(th1, th2, name, tcanvas):
