@@ -5,6 +5,10 @@ from array import array
 from subprocess import Popen, PIPE
 from re import search
 
+# VARIABLES:
+colors = [ROOT.kBlue, ROOT.kRed]
+# /VARIABLES
+
 # CLASSES:
 class dataset:
 	# Construction:
@@ -68,6 +72,26 @@ def setup_root():
 	tcanvas = TCanvas("c1", "c1", 500, 500)
 	tcanvas.SetCanvasSize(500, 500)
 	return tcanvas
+
+def list_file(full_path):		# This isn't quite complete, it's basically just for listing all histograms in the highest directory of a root file (at "full_path").
+	tfile = TFile(full_path)
+	return list_tfile(tfile)
+
+def get_tfile(full_path):		# This is so pointless ...
+	return TFile(full_path)
+
+def list_tfile(tfile):
+	tlist = tfile.GetListOfKeys()
+	return [item.GetName() for item in tlist]
+
+def get_tobject(tfile, name):
+	ROOT.SetOwnership(tfile, 0)
+	return tfile.Get(name)
+
+def get_tobjects_all(tfile):
+	names = list_tfile(tfile)
+	ROOT.SetOwnership(tfile, 0)
+	return [tfile.Get(name) for name in names]
 
 def get_ttree(full_path, ttree_name="analyzer/events"):
 	tfile = TFile(full_path)
@@ -240,7 +264,16 @@ def make_tg(x_title="", x=[], x_e=[], y_title="", y=[], y_e=[], title=""):
 #	print tg
 	return tg
 
-
+def superimpose(th1s, logy=False):		# Add a legend!
+	tc = setup_root()
+	for i, th1 in enumerate(th1s):
+		th1.SetLineColor(colors[i])
+		if i == 0:
+			th1.Draw()
+		else:
+			th1.Draw("same")
+	tc.SetLogy(logy)
+	return tc
 
 
 
