@@ -1,9 +1,10 @@
 import os
 import ROOT
-from ROOT import TFile, TTree, TChain, TCanvas, TH1F, TH2F, TGraphErrors, TList
+from ROOT import TFile, TTree, TChain, TCanvas, TH1F, TH2F, TGraphErrors, TLegend, TList
 from array import array
 from subprocess import Popen, PIPE
 from re import search
+from truculence import packing, color
 
 # VARIABLES:
 colors = [ROOT.kBlue, ROOT.kRed]
@@ -88,10 +89,14 @@ def get_tobject(tfile, name):
 	ROOT.SetOwnership(tfile, 0)
 	return tfile.Get(name)
 
-def get_tobjects_all(tfile):
+def get_tobjects_all(tfile, kind=""):
 	names = list_tfile(tfile)
 	ROOT.SetOwnership(tfile, 0)
-	return [tfile.Get(name) for name in names]
+	tobjects = [tfile.Get(name) for name in names]
+	if not kind or kind.lower() == "all":
+		return tobjects
+	else:
+		return [tobject for tobject in tobjects if tobject.ClassName().lower() == kind.lower()]
 
 def get_ttree(full_path, ttree_name="analyzer/events"):
 	tfile = TFile(full_path)
@@ -236,6 +241,23 @@ def print_th(th1, th2, name, tcanvas):
 		tcanvas.SaveAs("plots/{0}/h2-{1}.pdf".format(name, key))
 		tcanvas.SaveAs("plots/{0}/h2-{1}.svg".format(name, key))
 
+def make_tlegend(th1s, labels=[], key="lpe", corner=1):		# "corner" puts the legend in corner 0-3, starting from top left.
+	if not labels:
+#		labels = [th1.GetTitle() for th1 in th1s]
+		labels = [th1.GetName() for th1 in th1s]
+	if corner == 0:
+		tl = TLegend(0.3, 0.7, 0.1, 0.9)		#East edge, S, W, N
+	if corner == 1:
+		tl = TLegend(0.9, 0.7, 0.7, 0.9)		#East edge, S, W, N
+	if corner == 2:
+		tl = TLegend(0.9, 0.1, 0.7, 0.3)		#East edge, S, W, N
+	if corner == 3:
+		tl = TLegend(0.3, 0.1, 0.1, 0.3)		#East edge, S, W, N
+	for i, th1 in enumerate(th1s):
+		tl.AddEntry(th1, labels[i], key)
+	ROOT.SetOwnership(tl, 0)
+	return tl
+
 def make_tg(x_title="", x=[], x_e=[], y_title="", y=[], y_e=[], title=""):
 	tcanvas = TCanvas("z", "z", 500, 500)
 	tcanvas.SetCanvasSize(500, 500)
@@ -265,17 +287,42 @@ def make_tg(x_title="", x=[], x_e=[], y_title="", y=[], y_e=[], title=""):
 	return tg
 
 def superimpose(th1s, logy=False):		# Add a legend!
+	n = len(th1s)
+	colors = color.pick(n)
+	tcolors = [c.tcolor() for c in colors]
+#	make_palette(colors, sq=0.4)
 	tc = setup_root()
 	for i, th1 in enumerate(th1s):
-		th1.SetLineColor(colors[i])
+		th1.SetLineColor(tcolors[i].GetNumber())
+		th1.SetMarkerColor(tcolors[i].GetNumber())
 		if i == 0:
 			th1.Draw()
 		else:
 			th1.Draw("same")
 	tc.SetLogy(logy)
+	tl = make_tlegend(th1s)
+	print tl
+	tl.Draw()
+	tc.Modified()
+	tc.Update()
+	ROOT.gStyle.SetOptStat(0)
 	return tc
 
-
+def make_palette(colors, f="palette.pdf", sq=0.5):
+	tc = setup_root()
+	n = len(colors)
+	print n, packing.squareness(n)
+	while packing.squareness(n) > sq:
+		n += 1
+	print n, packing.squareness(n)
+	factors = packing.factorize(n)[-1]
+	tc.SetCanvasSize(500, int(500*float(factors[0])/factors[1]))
+	tc.Divide(factors[1], factors[0], 0.01, 0.01)
+	for i, c in enumerate(colors):
+		tc.cd(i + 1)
+		tcolor = c.tcolor()
+		ROOT.gPad.SetFillColor(tcolor.GetNumber())
+	tc.SaveAs(f)
 
 
 
