@@ -13,10 +13,10 @@ colors = [ROOT.kBlue, ROOT.kRed]
 # CLASSES:
 class dataset:
 	# Construction:
-	def __init__(self, name="", sigma=1):
+	def __init__(self, name="", sigma=None):
 		self.name = name
 		self.sigma = sigma
-		info = get_files(name=self.name)
+		info = get_files(name=self.name, v=False)
 		self.dir = info["dir"]
 		self.files = info["files"]
 		self.files_full = ["{0}/{1}".format(self.dir, f) for f in self.files]
@@ -41,7 +41,7 @@ def test():
 	return "Hello world! (analysis)"
 
 ## Dataset functions:
-def get_files(name="QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8", username="tote"):
+def get_files(name="QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8", username="tote", v=True):
 	ds_path = "/eos/uscms/store/user/{0}/{1}".format(username, name)
 	ds_dir = ""
 	files = []
@@ -51,7 +51,7 @@ def get_files(name="QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8", username="tote"
 	ds_path += "/{0}".format(custom_names[0])
 	dates = os.listdir(ds_path)
 	if len(dates) > 1:
-		print "WARNING: It's unclear what files you want to run over. I'm going to run over the following directory:\n{0}/{1}".format(ds_path, dates[-1])
+		if (v): print "WARNING: It's unclear what files you want to run over. I'm going to run over the following directory:\n{0}/{1}".format(ds_path, dates[-1])
 	ds_dir = "{0}/{1}/0000".format(ds_path, dates[-1])
 	files = [f for f in os.listdir(ds_dir) if ".root" in f]
 	return {
@@ -70,6 +70,7 @@ def get_nevents(f=""):
 ## ROOT functions:
 def setup_root():
 	ROOT.gROOT.SetBatch()
+	ROOT.gROOT.SetStyle("plain")
 	tcanvas = TCanvas("c1", "c1", 500, 500)
 	tcanvas.SetCanvasSize(500, 500)
 	return tcanvas
@@ -256,6 +257,7 @@ def make_tlegend(th1s, labels=[], key="lpe", corner=1):		# "corner" puts the leg
 	for i, th1 in enumerate(th1s):
 		tl.AddEntry(th1, labels[i], key)
 	ROOT.SetOwnership(tl, 0)
+	tl.SetFillColor(0)
 	return tl
 
 def make_tg(x_title="", x=[], x_e=[], y_title="", y=[], y_e=[], title=""):
@@ -286,7 +288,7 @@ def make_tg(x_title="", x=[], x_e=[], y_title="", y=[], y_e=[], title=""):
 #	print tg
 	return tg
 
-def superimpose(th1s, logy=False):		# Add a legend!
+def superimpose(th1s, logy=False, normalize=False, leg_labels=[], leg_corner=1):
 	n = len(th1s)
 	colors = color.pick(n)
 	tcolors = [c.tcolor() for c in colors]
@@ -295,13 +297,20 @@ def superimpose(th1s, logy=False):		# Add a legend!
 	for i, th1 in enumerate(th1s):
 		th1.SetLineColor(tcolors[i].GetNumber())
 		th1.SetMarkerColor(tcolors[i].GetNumber())
+		if normalize:
+			norm = float(th1.Integral())
+			if norm  > 0:
+				th1.Scale(1/norm)
+			else:
+				print "WARNING (analysis.superimpose): You are trying to superimpose at least one empty histogram."
+				th1.Scale(0)
 		if i == 0:
 			th1.Draw()
 		else:
 			th1.Draw("same")
 	tc.SetLogy(logy)
-	tl = make_tlegend(th1s)
-	print tl
+	tl = make_tlegend(th1s, labels=leg_labels, corner=leg_corner)
+#	print tl
 	tl.Draw()
 	tc.Modified()
 	tc.Update()
