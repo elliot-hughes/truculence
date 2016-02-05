@@ -13,13 +13,14 @@ colors = [ROOT.kBlue, ROOT.kRed]
 # CLASSES:
 class dataset:
 	# Construction:
-	def __init__(self, name="", sigma=None):
+	def __init__(self, name="", sigma=None, ds_path=None):
 		self.name = name
 		self.sigma = sigma
-		info = get_files(name=self.name, v=False)
-		self.dir = info["dir"]
-		self.files = info["files"]
-		self.files_full = ["{0}/{1}".format(self.dir, f) for f in self.files]
+		if ds_path:
+			info = get_files(name=self.name, v=False)
+			self.dir = info["dir"]
+			self.files = info["files"]
+			self.files_full = ["{0}/{1}".format(self.dir, f) for f in self.files]
 	# /Construction
 	
 	# Properties:
@@ -40,19 +41,36 @@ class dataset:
 def test():
 	return "Hello world! (analysis)"
 
+def get_cmssw(parsed=True):
+	cmssw_raw = "/cvmfs/cms.cern.ch/slc6_amd64_gcc491/cms/cmssw-patch/CMSSW_7_4_1_patch3"
+	try:
+		cmssw_raw = Popen(['echo $CMSSW_RELEASE_BASE'], shell = True, stdout = PIPE, stderr = PIPE).communicate()[0].strip()
+	except Exception as ex:
+		print ex
+	if parsed:
+		return ''.join([(i.replace("patch", "")).zfill(2) for i in (cmssw_raw.split("/")[-1]).split("_")[1:]])
+#		return ''.join([d for d in list((search("/?([^/]*)$", cmssw_raw)).group(1)) if d.isdigit()])
+	else:
+		return cmssw_raw
+
 ## Dataset functions:
 def get_files(name="QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8", username="tote", v=True):
 	ds_path = "/eos/uscms/store/user/{0}/{1}".format(username, name)
+#	print ds_path
 	ds_dir = ""
 	files = []
 	custom_names = os.listdir(ds_path)
+#	print custom_names
 	if len(custom_names) > 1:
 		print "WARNING: There were multiple \"custom names\"!"
 	ds_path += "/{0}".format(custom_names[0])
 	dates = os.listdir(ds_path)
 	if len(dates) > 1:
 		if (v): print "WARNING: It's unclear what files you want to run over. I'm going to run over the following directory:\n{0}/{1}".format(ds_path, dates[-1])
+#	print dates
 	ds_dir = "{0}/{1}/0000".format(ds_path, dates[-1])
+#	print ds_path
+#	print ds_dir
 	files = [f for f in os.listdir(ds_dir) if ".root" in f]
 	return {
 		"dir": ds_dir,
@@ -329,7 +347,7 @@ def make_palette(colors, f="palette.pdf", sq=0.5):
 	tc.Divide(factors[1], factors[0], 0.01, 0.01)
 	for i, c in enumerate(colors):
 		tc.cd(i + 1)
-		tcolor = c.tcolor()
+		tcolor = c.tcolor
 		ROOT.gPad.SetFillColor(tcolor.GetNumber())
 	tc.SaveAs(f)
 

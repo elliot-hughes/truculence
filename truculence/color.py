@@ -24,10 +24,13 @@ class color:
 		
 		# HSL:
 		## To do: construct function rgb_to_hsl.
+		
+		# Other:
+		self.tcolor = self.get_tcolor()
 	# /Construction
 	
 	# Methods:
-	def tcolor(self):
+	def get_tcolor(self):
 		tc = ROOT.TColor(self.id, self.r, self.g, self.b)
 		ROOT.SetOwnership(tc, 0)
 		return tc

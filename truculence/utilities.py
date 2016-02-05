@@ -20,3 +20,25 @@ def string_to_time(string):
 #	print datetime.utcfromtimestamp(0)
 	delta = time_object - datetime.utcfromtimestamp(0)
 	return delta.total_seconds()
+
+def progress(current, total, text="", width=50):
+	full = int((current + 1)*(float(width)/total))
+	empty = width - 1 - full
+	percent = 100*float(current + 1)/total
+	if current == total - 1:
+		print "\t[{}]\t{:.2f} %".format("="*width, 100)
+		print "\033[J\033[F"		# Clear to the end of the screen, then move the cursor up one line up
+	elif current < total - 1:
+		if current%4 == 0:
+			print "\t[{}-{}]\t{:.2f} %".format("="*full, " "*empty, percent)
+		if (current+1)%4 == 0:
+			print "\t[{}/{}]\t{:.2f} %".format("="*full, " "*empty, percent)
+		if (current+2)%4 == 0:
+			print "\t[{}|{}]\t{:.2f} %".format("="*full, " "*empty, percent)
+		if (current+3)%4 == 0:
+			print "\t[{}\\{}]\t{:.2f} %".format("="*full, " "*empty, percent)
+		print "\033[J",		# Clear to the end of the screen (from the new line after the bar)
+		print "\t\t" + str(text)
+		print "\033[2F",		# Move the cursor up two lines.
+	else:
+		print "ERROR (utilities.progress): You tried to go over the maximum: {}/{} ({} %)".format(current, total, percent)
