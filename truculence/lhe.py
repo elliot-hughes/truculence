@@ -1,13 +1,75 @@
-from re import search
-import os
+# IMPORTS:
+import os, re
+# :IMPORTS
 
+
+# CLASSES:
+class init:
+	def __init__(self, lhe_string):
+		match = re.search("(<init>[\s\S]*</init>)", lhe_string)
+#		print lhe_string
+#		print match
+		if match:
+			self.raw = match.group(1)
+		else:
+			self.raw = False
+	
+	def __nonzero__(self):
+		return bool(self.raw)
+
+
+class event:
+	def __init__(self, lhe_string):
+		match = re.search("(<event>[\s\S]*</event>)", lhe_string)
+#		print lhe_string
+#		print match
+		if match:
+			self.raw = match.group(1)
+			lines = [line for line in self.raw.split("\n") if not re.search("^#", line.strip()) and not line.strip() in ["<event", "</event>"]]
+			self.meta_raw = lines[1]
+			particles_raw = lines[2:]
+			self.particles = []
+			for particle_raw in particles_raw:
+				pieces = particle_raw.split()
+#				print particle_raw
+#				print pieces
+				particle = {}
+				particle["pdgid"] = int(pieces[0])
+				particle["p"] = (float(pieces[9]), float(pieces[6]), float(pieces[7]), float(pieces[8]))
+				particle["e"] = particle["p"][0]
+				particle["px"] = particle["p"][1]
+				particle["py"] = particle["p"][2]
+				particle["pz"] = particle["p"][3]
+				particle["pt"] = (particle["px"]**2 + particle["py"]**2)**(0.5)
+				particle["m"] = float(pieces[10])
+				self.particles.append(particle)
+			self.squarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(1000001, 1000007)]
+		else:
+			self.raw = False
+	
+	def __nonzero__(self):
+		return bool(self.raw)
+# :CLASSES
+
+
+
+
+
+
+
+
+
+
+
+
+# OLD FUNCTIONS:
 def get_info(f=""):
 #	labels = ["event", "init", "header", "MGVersion", "MG5ProcCard", "MGProcCard", "MGRunCard", "slha", "MGGenerationInfo", "other"]
 	n = {}
 	with open(f) as file_in:		# This won't load the entire file into memory, which is important since LHE files can be enormous.
 		for line in file_in:
-			match_start = search("<(\w+)\s?.*>", line)
-			match_end = search("</(\w+)\s?.*>", line)
+			match_start = re.search("<(\w+)\s?.*>", line)
+			match_end = re.search("</(\w+)\s?.*>", line)
 			if match_start:
 				label = match_start.group(1)
 #				if label != "event":

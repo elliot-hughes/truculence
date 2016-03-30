@@ -24,10 +24,18 @@ def listdir(tf):
 
 def tc_nevents(tc):
 	nevents = []
-	for tce in tc.GetListOfFiles():
+	bad = []
+	for i, tce in enumerate(tc.GetListOfFiles()):
 		f = tce.GetTitle()                 # This is the file name (GetName() returns the ttree name)
 		tf = TFile.Open(f)
-		tt = tf.Get(tce.GetName())
-		nevents.append(tt.GetEntries())
+		try:
+			tt = tf.Get(tce.GetName())
+		except:
+			bad.append(i)
+			nevents.append(0)
+			print "WARNING: Something is wrong with File {} in the TChain.".format(i)
+		else:
+			nevents.append(tt.GetEntries())
+	print bad
 	return nevents
 # /FUNCTIONS
