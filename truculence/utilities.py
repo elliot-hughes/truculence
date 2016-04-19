@@ -1,6 +1,18 @@
 import math
 from time import time, sleep
 from datetime import datetime
+import collections
+
+def flatten(d, parent_key='', sep='_'):
+	items = []
+	for key, value in d.items():
+		new_key = parent_key + sep + key if parent_key else key
+#		print new_key
+		if value and isinstance(value, collections.MutableMapping):
+			items.extend(flatten(value, parent_key=new_key).items())
+		else:
+			items.append((new_key, value))
+	return dict(items)
 
 def roundup(x):		# Round up to the nearest 10.
 	return int(math.ceil(x/10.0))*10

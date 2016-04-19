@@ -1,9 +1,43 @@
 # IMPORTS:
 import os, re
+import utilities
 # :IMPORTS
 
 
+# VARIABLES:
+tags = {
+	"LesHouchesEvents": {
+		"event": {},
+		"init": {},
+		"header": {
+			"MGVersion": {},
+			"MG5ProcCard": {},
+			"MGProcCard": {},
+			"MGRunCard": {},
+			"slha": {},
+			"MCGenerationInfo": {},
+		},
+	},
+}
+tags_full = utilities.flatten(tags).keys()
+tags_all = [tag_full.split("_")[-1] for tag_full in tags_full]
+# :VARIABLES
+
+
 # CLASSES:
+class header:
+	def __init__(self, lhe_string):
+		match = re.search("(<header>[\s\S]*</header>)", lhe_string)
+#		print lhe_string
+#		print match
+		if match:
+			self.raw = match.group(1)
+		else:
+			self.raw = False
+	
+	def __nonzero__(self):
+		return bool(self.raw)
+
 class init:
 	def __init__(self, lhe_string):
 		match = re.search("(<init>[\s\S]*</init>)", lhe_string)
@@ -25,7 +59,7 @@ class event:
 #		print match
 		if match:
 			self.raw = match.group(1)
-			lines = [line for line in self.raw.split("\n") if not re.search("^#", line.strip()) and not line.strip() in ["<event", "</event>"]]
+			lines = [line for line in self.raw.split("\n") if not re.search("^#", line.strip()) and not line.strip() in ["<event>", "</event>"]]
 			self.meta_raw = lines[1]
 			particles_raw = lines[2:]
 			self.particles = []

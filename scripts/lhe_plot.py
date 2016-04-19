@@ -5,9 +5,8 @@ import ROOT
 # :IMPORTS
 
 # VARIABLES:
-cut_pt = 300
-lhe_in = "sqtojjjj_200.lhe"
-#lhe_out = "out.lhe"
+#lhe_in = "/users/h2/tote/madgraph/sqtojjjj_trial1/Events/sqto4j_200_01/unweighted_events.lhe"
+lhe_in = "out.lhe"
 ROOT.gROOT.SetBatch()
 tc = ROOT.TCanvas("tc", "tc")
 plot = ROOT.TH1D("h1", "h1", 50, 0, 1000)
@@ -76,7 +75,7 @@ def main():
 	plot.Draw()
 	tc.SaveAs(plot_out)
 	
-	print n_inits, n_events, n_events_accepted, float(n_events_accepted)/n_events*100
+	print n_inits, n_events
 # :FUNCTIONS
 
 # MAIN:
