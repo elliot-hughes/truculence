@@ -12,6 +12,18 @@ from ROOT import TFile
 # /VARIABLES
 
 # CLASSES:
+class rfile:
+	def __init__(self, path):
+		self.path = path
+		self.tf = TFile(path)
+	
+	def get_ttrees(self):		# So far, this only gets them from the top directory (160419).
+		tts = {}
+		tkeys = self.tf.GetListOfKeys()
+		for tkey in tkeys:
+			if tkey.GetClassName() == "TTree":
+				tts[tkey.GetName()] = self.tf.Get(tkey.GetName())
+		return tts
 # /CLASSES
 
 # FUNCTIONS:
@@ -36,6 +48,8 @@ def tc_nevents(tc):
 			print "WARNING: Something is wrong with File {} in the TChain.".format(i)
 		else:
 			nevents.append(tt.GetEntries())
-	print bad
+	if bad:
+		print "WARNING (root.tc_nevents): Some of the files in the TChain are bad:"
+		print bad
 	return nevents
 # /FUNCTIONS
