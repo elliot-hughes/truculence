@@ -90,7 +90,93 @@ class event:
 
 
 
+# FUNCTIONS:
+def parse(lhe_in, function=None):
+	whatever = 0
+	# Set up meta information:
+	pieces = {}
+	controls = {}
+	raws = {}
+	ns = {}
+	for tag_full in tags_full:
+		controls[tag_full] = {}
+		controls[tag_full]["start"] = False
+		controls[tag_full]["end"] = False
+		controls[tag_full]["open"] = False
+#		raws[tag_full] = ""
+		ns[tag_full] = 0
+	controls_internal = {}
+	for tag in tags_all:
+		controls_internal[tag] = {}
+		controls_internal[tag]["start"] = False
+		controls_internal[tag]["end"] = False
+		controls_internal[tag]["open"] = False
+	tags_full_open = []
 
+	# Start looping over the input file:
+	with open(lhe_in, "r") as file_in:
+		for line in file_in:                 # This method is good on memory, acting as an iterator.
+			# Count tag beginnings and endings:
+			complete = {}
+			counts = {}
+			for tag in tags_all:
+				starts = line.count("<{}".format(tag))
+				ends = line.count("</{}".format(tag))
+				if starts or ends:
+					counts[tag] = (starts, ends)
+				
+				# This is an LHE-specific kludge:
+				assert(starts < 2)
+				assert(ends < 2)
+				# :
+			
+			# Deal with openings:
+			for tag, start_end in counts.iteritems():
+				starts = start_end[0]
+				
+				if starts:
+					if tags_full_open:
+						tags_full_open += ["{}_{}".format(tag_full, tag) for tag_full in tags_full_open]
+					else:
+						tags_full_open.append(tag)
+			## Record open raw info:
+			for tag_full in tags_full_open:
+				if tag_full.split("_") > 1:
+					if tag_full not in raws:
+						raws[tag_full] = line
+					else:
+						raws[tag_full] += line
+			
+			# Deal with endings:
+			tags_full_closed = []
+			for tag, start_end in counts.iteritems():
+				ends = start_end[1]
+				
+				if ends:
+					for tag_full in tags_full_open:
+						tag_open = tag_full.split("_")[-1]
+						if tag == tag_open:
+							if tag_full in pieces:
+								pieces[tag_full] += 1
+							else:
+								pieces[tag_full] = 1
+							# Form objects:
+							if tag == "event":
+								complete[tag] = event(raws[tag_full])
+							elif tag == "init":
+								complete[tag] = init(raws[tag_full])
+							elif tag == "header":
+								complete[tag] = header(raws[tag_full])
+							tags_full_closed.append(tag_full)
+			for tag_full in tags_full_closed:
+				tags_full_open.remove(tag_full)
+				del raws[tag_full]
+			
+			## Inside loop function:
+			if function:
+				function(complete)
+	return pieces
+# :FUNCTIONS
 
 
 
