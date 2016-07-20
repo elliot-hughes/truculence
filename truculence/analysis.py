@@ -4,6 +4,8 @@ import os
 from array import array
 from subprocess import Popen, PIPE
 from re import search
+from utilities import progress
+import root
 #from truculence import packing, color
 
 ## VARIABLES:
@@ -77,13 +79,29 @@ def get_cmssw(parsed=True):
 #		"files": files,
 #	}
 
-def get_nevents(f="", cmslpc=True):
-	raw_output = Popen(['echo "Events->GetEntries()" | root -l {}{}'.format("root://cmsxrootd.fnal.gov/" if cmslpc else "", f)], shell = True, stdout = PIPE, stderr = PIPE).communicate()
-	match = search("\(Long64_t\) (\d+)\s", raw_output[0])
-	if match:
-		return int(match.group(1))
-	else:
-		return False
+def get_nevents(path="", tt_name="Events", site="cmslpc", v=False):
+	if not isinstance(path, list):
+		path = [path]
+	
+	if site == "cmslpc":
+		path = ["root://cmsxrootd.fnal.gov/" + p if "/store/user/" in p and "root:" not in p else p for p in path]
+	
+#	print path
+	nevents = root.tc_nevents(root.make_tc(path, name=tt_name))
+	return nevents
+#	return sum(nevents)
+	
+#	# Slow method:
+#	n = 0
+#	for i, f in enumerate(path):
+#		progress(i + 1, len(path), "File {}/{}".format(i + 1, len(path)))
+#		raw_output = Popen(['echo "Events->GetEntries()" | root -l {}{}'.format("root://cmsxrootd.fnal.gov/" if site == "cmslpc" else "", f)], shell = True, stdout = PIPE, stderr = PIPE).communicate()
+#		match = search("\(Long64_t\) (\d+)\s", raw_output[0])
+#		if match:
+#			n += int(match.group(1))
+#		else:
+#			print "WARNING: Couldn't find the number of events in {}".format(f)
+#	return n
 
 ### ROOT functions:
 #def setup_root():
@@ -100,22 +118,22 @@ def get_nevents(f="", cmslpc=True):
 #def get_tfile(full_path):		# This is so pointless ...
 #	return TFile(full_path)
 
-#def list_tfile(tfile):
-#	tlist = tfile.GetListOfKeys()
-#	return [item.GetName() for item in tlist]
+def list_tfile(tfile):
+	tlist = tfile.GetListOfKeys()
+	return [item.GetName() for item in tlist]
 
 #def get_tobject(tfile, name):
 #	ROOT.SetOwnership(tfile, 0)
 #	return tfile.Get(name)
 
-#def get_tobjects_all(tfile, kind=""):
-#	names = list_tfile(tfile)
+def get_tobjects(tfile, kind=""):
+	names = list_tfile(tfile)
 #	ROOT.SetOwnership(tfile, 0)
-#	tobjects = [tfile.Get(name) for name in names]
-#	if not kind or kind.lower() == "all":
-#		return tobjects
-#	else:
-#		return [tobject for tobject in tobjects if tobject.ClassName().lower() == kind.lower()]
+	tobjects = [tfile.Get(name) for name in names]
+	if not kind or kind.lower() == "all":
+		return tobjects
+	else:
+		return [tobject for tobject in tobjects if tobject.ClassName().lower() == kind.lower()]
 
 #def get_ttree(full_path, ttree_name="analyzer/events"):
 #	tfile = TFile(full_path)

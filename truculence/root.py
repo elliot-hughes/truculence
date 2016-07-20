@@ -5,7 +5,7 @@
 ####################################################################
 
 # IMPORTS:
-from ROOT import TFile
+from ROOT import TFile, TChain, SetOwnership
 # /IMPORTS
 
 # VARIABLES:
@@ -33,6 +33,15 @@ def listdir(tf):
 		return [tkey.GetName() for tkey in tkeys]
 	else:
 		return False
+
+
+def make_tc(files, name="tc"):
+	tc = TChain(name)
+	for f in files:
+		tc.Add(f)
+	SetOwnership(tc, 0)
+	return tc
+
 
 def tc_nevents(tc):
 	nevents = []

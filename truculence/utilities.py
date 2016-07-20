@@ -2,6 +2,7 @@ import math
 from time import time, sleep
 from datetime import datetime
 import collections
+import yaml
 
 def flatten(d, parent_key='', sep='_'):
 	items = []
@@ -54,3 +55,17 @@ def progress(current, total, text="", width=50):
 		print "\033[2F",		# Move the cursor up two lines.
 	else:
 		print "ERROR (utilities.progress): You tried to go over the maximum: {}/{} ({} %)".format(current, total, percent)
+
+
+# http://stackoverflow.com/questions/5121931/in-python-how-can-you-load-yaml-mappings-as-ordereddicts:
+def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=collections.OrderedDict):
+	class OrderedLoader(Loader):
+		pass
+	
+	def construct_mapping(loader, node):
+		loader.flatten_mapping(node)
+		return object_pairs_hook(loader.construct_pairs(node))
+	
+	OrderedLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping)
+	
+	return yaml.load(stream, OrderedLoader)

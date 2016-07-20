@@ -176,6 +176,11 @@ def parse(lhe_in, function=None):
 			if function:
 				function(complete)
 	return pieces
+
+def get_nevents(f):
+	pieces = parse(f)
+#	print pieces
+	return pieces["event"]
 # :FUNCTIONS
 
 
