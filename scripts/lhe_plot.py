@@ -5,12 +5,13 @@ import ROOT
 # :IMPORTS
 
 # VARIABLES:
-#lhe_in = "/users/h2/tote/madgraph/sqtojjjj_trial1/Events/sqto4j_200_01/unweighted_events.lhe"
-lhe_in = "out.lhe"
+#lhe_in = "/users/h2/tote/madgraph/sqto4j/Events/sq150to4j_cutht700/unweighted_events.lhe"
+#lhe_in = "out.lhe"
 ROOT.gROOT.SetBatch()
 tc = ROOT.TCanvas("tc", "tc")
-plot = ROOT.TH1D("h1", "h1", 50, 0, 1000)
-plot_out = "pt.pdf"
+th1_pt = ROOT.TH1D("pt", "pt", 50, 0, 1000)
+th1_ht = ROOT.TH1D("ht", "ht", 50, 0, 2000)
+#plot_out = "pt.pdf"
 # :VARIABLES
 
 # CLASSES:
@@ -18,6 +19,10 @@ plot_out = "pt.pdf"
 
 # FUNCTIONS:
 def main():
+	# Arguments and variables:
+	assert len(sys.argv) == 2
+	lhe_in = sys.argv[1]
+	
 	n_inits = 0
 	n_events = 0
 	n_events_accepted = 0
@@ -69,11 +74,17 @@ def main():
 				if event:
 					n_events += 1
 					pts = [squark["pt"] for squark in event.squarks]
+					ht = sum([quark["pt"] for quark in event.quarks])
 					for pt in pts:
-						plot.Fill(pt)
+						th1_pt.Fill(pt)
+					th1_ht.Fill(ht)
 	
-	plot.Draw()
-	tc.SaveAs(plot_out)
+	tc.SetLogy(1)
+	th1_pt.Draw()
+	tc.SaveAs("{}.pdf".format(th1_pt.GetName()))
+	tc.Clear()
+	th1_ht.Draw()
+	tc.SaveAs("{}.pdf".format(th1_ht.GetName()))
 	
 	print n_inits, n_events
 # :FUNCTIONS
