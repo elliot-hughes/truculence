@@ -5,10 +5,11 @@ from truculence import lhe
 # :IMPORTS
 
 # VARIABLES:
-cut_pt = 200
-#lhe_in = "/users/h2/tote/madgraph/sqtojjjj_trial1/Events/sqto4j_200_01/unweighted_events.lhe"
+cut_pt = 200		# 200
+cut_ht = 0
+lhe_in = "/users/h2/tote/madgraph/sqto4j/Events/sq400to4j/unweighted_events.lhe"
 lhe_in = "/users/h2/tote/lhe/sq150to4j.lhe"
-lhe_out = "/users/h2/tote/lhe/sq150to4j_cutpt{}.lhe".format(cut_pt)
+lhe_out = "/users/h2/tote/lhe/sq400to4j_cutpt{}.lhe".format(cut_pt)
 # :VARIABLES
 
 # CLASSES:
@@ -16,6 +17,9 @@ lhe_out = "/users/h2/tote/lhe/sq150to4j_cutpt{}.lhe".format(cut_pt)
 
 # FUNCTIONS:
 def main():
+	# Arguments and variables:
+#	assert len(sys.argv) == 2
+	
 	n_inits = 0
 	n_events = 0
 	n_events_accepted = 0
@@ -71,10 +75,18 @@ def main():
 				if event:
 					n_events += 1
 					pts = [squark["pt"] for squark in event.squarks]
-					if min(pts) >= cut_pt:
-						n_events_accepted += 1
-						with open(lhe_out, "a") as file_out:
-							file_out.write(event.raw + "\n")
+					ht = sum([quark["pt"] for quark in event.quarks])
+					if cut_pt:
+						if min(pts) > cut_pt:
+							n_events_accepted += 1
+							with open(lhe_out, "a") as file_out:
+								file_out.write(event.raw + "\n")
+					elif cut_ht:
+						if ht >= cut_ht:
+							n_events_accepted += 1
+#							with open(lhe_out, "a") as file_out:
+#								file_out.write(event.raw + "\n")
+					
 
 	with open(lhe_out, "a") as file_out:
 		file_out.write("</LesHouchesEvents>")

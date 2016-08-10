@@ -77,6 +77,7 @@ class event:
 				particle["pt"] = (particle["px"]**2 + particle["py"]**2)**(0.5)
 				particle["m"] = float(pieces[10])
 				self.particles.append(particle)
+			self.quarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(-6, 0) + range(1, 7)]
 			self.squarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(1000001, 1000007)]
 		else:
 			self.raw = False
