@@ -18,6 +18,10 @@ def flatten(d, parent_key='', sep='_'):
 def roundup(x):		# Round up to the nearest 10.
 	return int(math.ceil(x/10.0))*10
 
+def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
+# See http://stackoverflow.com/questions/5595425/what-is-the-best-way-to-compare-floats-for-almost-equality-in-python
+	return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
 def time_string():
 	return datetime.now().strftime("%y%m%d_%H%M%S.%f")[:-3]		# Chop off the last three decimal places, leaving three (not rounding).
 
