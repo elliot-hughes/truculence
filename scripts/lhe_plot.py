@@ -1,5 +1,6 @@
 # IMPORTS:
-import sys, re
+import os, sys, re
+import xml.etree.ElementTree as ET
 from truculence import lhe
 import ROOT
 # :IMPORTS
@@ -22,6 +23,42 @@ def main():
 	# Arguments and variables:
 	assert len(sys.argv) == 2
 	lhe_in = sys.argv[1]
+	fname = lhe_in.split("/")[-1]
+	
+	if not os.path.exists(lhe_in):
+		print "ERROR: There's no file called '{}'".format(lhe_in)
+		return False
+	
+	cut_ht = 700
+	cut_pt = 200
+	n_total = 0
+	n_passed_ht = 0
+	n_passed_pt = 0
+	tree = ET.parse(lhe_in)
+	for i, event in enumerate(tree.findall("event")):
+		e = lhe.event(event)
+		n_total += 1
+		if min([sq["pt"] for sq in e.squarks]) > cut_pt:
+			n_passed_pt += 1
+		if e.ht > cut_ht:
+			n_passed_ht += 1
+	print "Events:", n_total
+	print "pT cut:", n_passed_pt
+	print "HT cut:", n_passed_ht
+	
+	return True
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	sys.exit()
 	
 	n_inits = 0
 	n_events = 0

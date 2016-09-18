@@ -1,5 +1,7 @@
 # IMPORTS:
 import os, re
+import xml.etree.ElementTree as ET
+#from xml.etree.ElementTree import Element
 import utilities
 # :IMPORTS
 
@@ -53,13 +55,18 @@ class init:
 
 
 class event:
-	def __init__(self, lhe_string):
-		match = re.search("(<event>[\s\S]*</event>)", lhe_string)
-#		print lhe_string
-#		print match
-		if match:
-			self.raw = match.group(1)
-			lines = [line for line in self.raw.split("\n") if not re.search("^#", line.strip()) and not line.strip() in ["<event>", "</event>"]]
+	def __init__(self, event):
+		if isinstance(event, ET.Element):
+			self.raw = event.text
+		elif isinstance(event, str):
+			match = re.search("(<event>[\s\S]*</event>)", event)
+			if match:
+				self.raw = match.group(1)
+		else:
+			print "ERROR (lhe.event): I don't understand the type of the input."
+		
+		if self.raw:
+			lines = [line for line in self.raw.split("\n") if not re.search("^#", line.strip()) and not line.strip() in ["<event>", "</event>"] and line.strip()]
 			self.meta_raw = lines[1]
 			particles_raw = lines[2:]
 			self.particles = []
@@ -79,6 +86,7 @@ class event:
 				self.particles.append(particle)
 			self.quarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(-6, 0) + range(1, 7)]
 			self.squarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(1000001, 1000007)]
+			self.ht = sum([quark["pt"] for quark in self.quarks])
 		else:
 			self.raw = False
 	
@@ -92,7 +100,17 @@ class event:
 
 
 # FUNCTIONS:
-def parse(lhe_in, function=None):
+def get_info(f):
+	if os.path.exists(f):
+		info = {}
+		tree = ET.parse(f)
+		info["nevents"] = len(tree.findall("event"))
+		return info
+	else:
+		return False
+
+
+def parse(lhe_in, function=None):		# This is old. I should use "elementtree". See "get_info".
 	whatever = 0
 	# Set up meta information:
 	pieces = {}
@@ -189,25 +207,25 @@ def get_nevents(f):
 
 
 # OLD FUNCTIONS:
-def get_info(f=""):
-#	labels = ["event", "init", "header", "MGVersion", "MG5ProcCard", "MGProcCard", "MGRunCard", "slha", "MGGenerationInfo", "other"]
-	n = {}
-	with open(f) as file_in:		# This won't load the entire file into memory, which is important since LHE files can be enormous.
-		for line in file_in:
-			match_start = re.search("<(\w+)\s?.*>", line)
-			match_end = re.search("</(\w+)\s?.*>", line)
-			if match_start:
-				label = match_start.group(1)
-#				if label != "event":
-#					print label
-				if label not in n:
-					n[label] = [0]*2
-				n[label][0] += 1
-			elif match_end:
-				label = match_end.group(1)
-				n[label][1] += 1
-	for label, count in n.iteritems():
-		print "{0}: {1}".format(label, count)
+#def get_info(f=""):
+##	labels = ["event", "init", "header", "MGVersion", "MG5ProcCard", "MGProcCard", "MGRunCard", "slha", "MGGenerationInfo", "other"]
+#	n = {}
+#	with open(f) as file_in:		# This won't load the entire file into memory, which is important since LHE files can be enormous.
+#		for line in file_in:
+#			match_start = re.search("<(\w+)\s?.*>", line)
+#			match_end = re.search("</(\w+)\s?.*>", line)
+#			if match_start:
+#				label = match_start.group(1)
+##				if label != "event":
+##					print label
+#				if label not in n:
+#					n[label] = [0]*2
+#				n[label][0] += 1
+#			elif match_end:
+#				label = match_end.group(1)
+#				n[label][1] += 1
+#	for label, count in n.iteritems():
+#		print "{0}: {1}".format(label, count)
 
 def simplify(f="", o="simple.lhe"):		# This function removes metadata from an LHE file.
 	# Delete the output file if it already exists:
