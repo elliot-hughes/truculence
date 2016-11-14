@@ -17,16 +17,41 @@ class rfile:
 		self.path = path
 		self.tf = TFile(path)
 	
+	def ls(self):		# Gets a list of the top directory.
+		tlist = self.tf.GetListOfKeys()
+		return [item.GetName() for item in tlist]
+	
+	def get_tobjects(self, kind=""):
+		names = self.ls()
+		tobjects = [self.tf.Get(name) for name in names]
+		if not kind or kind.lower() == "all":
+			return tobjects
+		else:
+			return [tobject for tobject in tobjects if tobject.ClassName().lower() == kind.lower()]
+	
 	def get_ttrees(self):		# So far, this only gets them from the top directory (160419).
-		tts = {}
-		tkeys = self.tf.GetListOfKeys()
-		for tkey in tkeys:
-			if tkey.GetClassName() == "TTree":
-				tts[tkey.GetName()] = self.tf.Get(tkey.GetName())
-		return tts
+		return self.get_tobjects(kind="ttree")
 # /CLASSES
 
 # FUNCTIONS:
+def list_tfile(tfile):
+	tlist = tfile.GetListOfKeys()
+	return [item.GetName() for item in tlist]
+
+def get_tobjects(f, kind=""):
+	tf_in = TFile.Open(f)
+	SetOwnership(tf_in, 0)
+	names = list_tfile(tf_in)
+	tobjects = [tf_in.Get(name) for name in names]
+	if not kind or kind.lower() == "all":
+		return tobjects
+	else:
+		return [tobject for tobject in tobjects if tobject.ClassName().lower() == kind.lower()]
+
+def get_ttrees(f):
+	return get_tobjects(f, kind="ttree")
+
+
 def listdir(tf):
 	if tf:
 		tkeys = tf.GetListOfKeys()

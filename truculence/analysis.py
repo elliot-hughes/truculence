@@ -135,6 +135,7 @@ def get_tobjects(tfile, kind=""):
 	else:
 		return [tobject for tobject in tobjects if tobject.ClassName().lower() == kind.lower()]
 
+
 #def get_ttree(full_path, ttree_name="analyzer/events"):
 #	tfile = TFile(full_path)
 #	ROOT.SetOwnership(tfile, 0)
