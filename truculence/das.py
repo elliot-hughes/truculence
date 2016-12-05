@@ -26,11 +26,15 @@ def get_datasets(name_query, instance="global"):
 		print raw_output[1]
 		return []
 
-def get_info(name, instance="global"):
+def get_info(name, instance="global", valid=True):
 # Get information about a dataset named "name".
 #	print name, instance
 	results = {}
-	raw_output = Popen(['das_client --query "file dataset={} instance=prod/{}" --format=json --limit=0'.format(name, instance)], shell=True, stdout=PIPE, stderr=PIPE).communicate()
+	cmd = 'das_client --query "file dataset={} instance=prod/{}'.format(name, instance)
+	if valid:
+		cmd += ' status=valid'
+	cmd += '" --format=json --limit=0'
+	raw_output = Popen([cmd], shell=True, stdout=PIPE, stderr=PIPE).communicate()
 #	print raw_output
 	if not raw_output[1]:		# No error
 		info = json.loads(raw_output[0])
@@ -51,8 +55,8 @@ def get_info(name, instance="global"):
 		print raw_output[1]
 	return results
 
-def get_files(name, n=-1, instance="global"):
-	info = get_info(name, instance=instance)
+def get_files(name, n=-1, instance="global", valid=True):
+	info = get_info(name, instance=instance, valid=valid)
 	if info:
 		if n == -1:
 			return info["files"]

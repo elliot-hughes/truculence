@@ -16,6 +16,7 @@ class rfile:
 	def __init__(self, path):
 		self.path = path
 		self.tf = TFile(path)
+		self.name = path.split("/")[-1]
 	
 	def ls(self):		# Gets a list of the top directory.
 		tlist = self.tf.GetListOfKeys()
