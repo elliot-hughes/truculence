@@ -15,12 +15,18 @@ def flatten(d, parent_key='', sep='_'):
 			items.append((new_key, value))
 	return dict(items)
 
+def flatten_list(l):
+	return [flatten_list(x) if isinstance(x, list) else x for sublist in l for x in sublist]
+
 def roundup(x):		# Round up to the nearest 10.
 	return int(math.ceil(x/10.0))*10
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
 # See http://stackoverflow.com/questions/5595425/what-is-the-best-way-to-compare-floats-for-almost-equality-in-python
-	return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+	if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+		return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+	else:
+		return a == b
 
 def time_string():
 	return datetime.now().strftime("%y%m%d_%H%M%S.%f")[:-3]		# Chop off the last three decimal places, leaving three (not rounding).
@@ -73,3 +79,11 @@ def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=collections.Order
 	OrderedLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping)
 	
 	return yaml.load(stream, OrderedLoader)
+
+def wcl(path):
+	n = 0
+	with open(path) as in_file:
+		n = sum(1 for line in in_file)
+	return n
+
+
