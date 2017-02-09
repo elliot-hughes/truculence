@@ -8,8 +8,8 @@
 	gStyle->SetCanvasBorderMode(0);		// -1: down, 0: no border, 1: up
 	gStyle->SetCanvasBorderSize(0);
 	gStyle->SetCanvasColor(kWhite);
-	gStyle->SetCanvasDefH(600);		// Height of canvas
-	gStyle->SetCanvasDefW(600);		// Width of canvas
+	gStyle->SetCanvasDefH(1000);		// Height of canvas
+	gStyle->SetCanvasDefW(1000);		// Width of canvas
 	
 	// Pad and margins:
 	gStyle->SetPadBorderMode(0);		// -1: down, 0: no border, 1: up
