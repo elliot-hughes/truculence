@@ -5,6 +5,7 @@
 ####################################################################
 
 # IMPORTS:
+from subprocess import check_call
 from ROOT import TFile, TChain, SetOwnership
 # /IMPORTS
 
@@ -31,7 +32,7 @@ class rfile:
 			return [tobject for tobject in tobjects if tobject.ClassName().lower() == kind.lower()]
 	
 	def get_ttrees(self):		# So far, this only gets them from the top directory (160419).
-		return self.get_tobjects(kind="ttree")
+		return {tt.GetName(): tt for tt in self.get_tobjects(kind="ttree")}
 # /CLASSES
 
 # FUNCTIONS:
@@ -87,4 +88,16 @@ def tc_nevents(tc):
 		print "WARNING (root.tc_nevents): Some of the files in the TChain are bad:"
 		print bad
 	return nevents
+
+
+def hadd(out_file, in_files):
+	assert(isinstance(in_files, list))
+	n = 500		# Maximum number of files per group.
+#	while not stop:
+	groups = [in_files[i:i+n] for i in range(0, len(in_files), n)]
+	temp_files = []
+	for i, group in enumerate(groups):
+		check_call("hadd -f {} {}".format("temp_anatuple_{}.root".format(i), " ".join(group)), shell=True)
+
+
 # /FUNCTIONS
