@@ -1,9 +1,13 @@
-vector<TLatex*> style_info(bool mc=true, int corner=1, double lum=2.3, bool draw=true) {
+vector<TLatex*> style_info(bool mc=true, TString lum="2.3", int corner=1, bool draw=true) {
 	// "CMS" word:
 	TLatex* info_cms = new TLatex(0, 0, "#bf{CMS}");
 	info_cms->SetNDC();		// Set text position to NDC coordinates.
 	info_cms->SetTextSize(0.06);
-	if (corner == 1) {
+	if (corner == 0) {
+		info_cms->SetX(0.21);
+		info_cms->SetY(0.87);
+	}
+	else if (corner == 1) {
 		info_cms->SetX(0.68);
 		info_cms->SetY(0.87);
 	}
@@ -11,16 +15,25 @@ vector<TLatex*> style_info(bool mc=true, int corner=1, double lum=2.3, bool draw
 		info_cms->SetX(0.68);
 		info_cms->SetY(0.37);
 	}
+	else if (corner == 4) {
+		info_cms->SetTextSize(0.05);
+		info_cms->SetX(0.27);
+		info_cms->SetY(0.945);
+	}
 	
 	// Dataset word:
 	TString ds = TString("#it{simulation}");
 	if (not mc) ds = TString("#it{preliminary}");
 	TLatex* info_ds = new TLatex(0, 0, ds);
 	info_ds->SetNDC();
-	info_ds->SetTextSize(0.04);
-	if (corner == 1) {
-		info_ds->SetX(0.64);
-		if (not mc) info_ds->SetX(0.62);
+	info_ds->SetTextSize(0.035);
+	if (corner == 0) {
+		info_ds->SetX(0.21);
+		info_ds->SetY(0.83);
+	}
+	else if (corner == 1) {
+		info_ds->SetX(0.63);
+		if (not mc) info_ds->SetX(0.64);
 		info_ds->SetY(0.83);
 	}
 	else if (corner == 2) {
@@ -28,12 +41,17 @@ vector<TLatex*> style_info(bool mc=true, int corner=1, double lum=2.3, bool draw
 		if (not mc) info_ds->SetX(0.62);
 		info_ds->SetY(0.33);
 	}
+	else if (corner == 4) {
+		info_ds->SetTextSize(0.025);
+		info_ds->SetX(0.38);
+		info_ds->SetY(0.945);
+	}
 	
 	// Luminosity information:
-	TLatex* info_lum = new TLatex(0, 0, "2.3 fb^{-1} (13 TeV)");
+	TLatex* info_lum = new TLatex(0, 0, lum + " fb^{-1} #scale[0.6]{(#sqrt{#it{s}} = 13 TeV)}");
 	info_lum->SetNDC();
 	info_lum->SetTextSize(0.04);
-	info_lum->SetX(0.56);
+	info_lum->SetX(0.54);
 	info_lum->SetY(0.945);
 	
 	vector<TLatex*> results;
@@ -59,10 +77,15 @@ TLatex* style_write(TString text, double x=0.60, double y=0.75, bool draw=true) 
 }
 
 
-void style_ylabel(THStack* hs) {
+void style_ylabel(THStack* h, TString xunit="GeV", TString yunit="Events") {
 	std::ostringstream oss;
-	oss << "Events/" << hs->GetXaxis()->GetBinWidth(1) << " GeV";
-	hs->GetYaxis()->SetTitle(oss.str().c_str());
+	oss << yunit << "/" << h->GetXaxis()->GetBinWidth(1) << " " << xunit;
+	h->GetYaxis()->SetTitle(oss.str().c_str());
+}
+void style_ylabel(TH1* h, TString xunit="GeV", TString yunit="Events") {
+	std::ostringstream oss;
+	oss << yunit << "/" << h->GetXaxis()->GetBinWidth(1) << " " << xunit;
+	h->GetYaxis()->SetTitle(oss.str().c_str());
 }
 
 void style_zlabel(TH2* h2, TString xunit="GeV", TString yunit="") {

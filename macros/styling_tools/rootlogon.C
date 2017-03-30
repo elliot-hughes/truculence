@@ -66,24 +66,24 @@
 	gStyle->SetTitleOffset(1.6, "z");
 	
 	// Statbox:
-	gStyle->SetOptStat(1111110);		// "ksiourmen"
+	gStyle->SetOptStat(1111110);		// "ksiourmen" (right-to-left)
 	gStyle->SetStatFont(FONT);
-	gStyle->SetStatFontSize(0.025);
+	gStyle->SetStatFontSize(0.040);
 	gStyle->SetStatX(0.80);
-	gStyle->SetStatY(0.90);
-	gStyle->SetStatW(0.20);
-	gStyle->SetStatH(0.30);
+	gStyle->SetStatY(0.80);
+	gStyle->SetStatW(0.30);
+	gStyle->SetStatH(0.50);
 	gStyle->SetStatBorderSize(0);
 	gStyle->SetStatColor(0);
 	gStyle->SetStatStyle(0);
 	
 	// Histograms:
-	gStyle->SetHistLineWidth(1);
+	gStyle->SetHistLineWidth(2);
 	gStyle->SetHistFillColor(kRed-10);		// Salmon
 	
 	// Markers:
 	gStyle->SetMarkerStyle(20);
-	gStyle->SetMarkerSize(0.5);
+	gStyle->SetMarkerSize(1.2);
 	
 	// Legend:
 	gStyle->SetLegendBorderSize(0);
@@ -94,11 +94,11 @@
 //	Double_t Red[]    = {0.0, 1.0};
 //	Double_t Green[]  = {0.0, 0.0};
 //	Double_t Blue[]   = {1.0, 0.0};
-	Double_t Red[]    = {1.0, 1.0};
-	Double_t Green[]  = {1.0, 0.0};
-	Double_t Blue[]   = {1.0, 0.0};
-	Double_t Length[] = {0.0, 1.0};
-	Int_t FI = TColor::CreateGradientColorTable(2, Length, Red, Green, Blue, 100);
+	Double_t Red[]    = {0.0, 0.0, 1.0};
+	Double_t Green[]  = {0.0, 0.6, 1.0};
+	Double_t Blue[]   = {0.4, 0.6, 0.0};
+	Double_t Length[] = {0.0, 0.5, 1.0};
+	Int_t FI = TColor::CreateGradientColorTable(3, Length, Red, Green, Blue, 100);
 	for (int i=0;i<100;i++) MyPalette[i] = FI+i;
 	gStyle->SetPalette(100, MyPalette);
 //	gStyle->SetPalette(kViridis);

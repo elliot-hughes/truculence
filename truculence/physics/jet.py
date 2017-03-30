@@ -41,6 +41,26 @@ class jet:
 		self.i = index
 #		self.update()
 	
+	def __add__(self, other):
+		if not other:
+			return self
+		if self.jec == 1 and other.jec == 1:
+			return jet(self.px + other.px, self.py + other.py, self.pz + other.pz, self.e + other.e)
+		else:
+			print "[!!] How should I add corrected jets?"
+			return False
+	
+	def __radd__(self, other):
+		if not other:
+			return self
+		if self.jec == 1 and other.jec == 1:
+			return jet(self.px + other.px, self.py + other.py, self.pz + other.pz, self.e + other.e)
+		else:
+			print "[!!] How should I add corrected jets?"
+			return False
+	
+	def __str__(self):
+		return "({}, {}, {}, {})".format(self.e, self.px, self.py, self.pz)
 	
 #	def update(self):
 #		self.pt = (self.px**2 + self.py**2)**(0.5)
