@@ -33,6 +33,9 @@ class rfile:
 	
 	def get_ttrees(self):		# So far, this only gets them from the top directory (160419).
 		return {tt.GetName(): tt for tt in self.get_tobjects(kind="ttree")}
+	
+	def get_ttree_names(self):
+		return self.get_ttrees().keys()
 # /CLASSES
 
 # FUNCTIONS:
@@ -90,14 +93,14 @@ def tc_nevents(tc):
 	return nevents
 
 
-def hadd(out_file, in_files):
+def hadd(out_file, in_files, n=500):
+	# n: maximum number of files per group.
 	assert(isinstance(in_files, list))
-	n = 500		# Maximum number of files per group.
 #	while not stop:
 	groups = [in_files[i:i+n] for i in range(0, len(in_files), n)]
 	temp_files = []
 	for i, group in enumerate(groups):
-		check_call("hadd -f {} {}".format("temp_anatuple_{}.root".format(i), " ".join(group)), shell=True)
+		check_call("hadd -f -n 50 {} {}".format("temp_anatuple_{}.root".format(i), " ".join(group)), shell=True)
 
 
 # /FUNCTIONS
