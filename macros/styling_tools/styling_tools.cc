@@ -1,4 +1,4 @@
-vector<TLatex*> style_info(bool mc=true, TString lum="2.3", int corner=1, bool draw=true) {
+vector<TLatex*> style_info(bool mc=true, TString lum="31.3", int corner=1, bool draw=true) {
 	// "CMS" word:
 	TLatex* info_cms = new TLatex(0, 0, "#bf{CMS}");
 	info_cms->SetNDC();		// Set text position to NDC coordinates.
@@ -32,7 +32,7 @@ vector<TLatex*> style_info(bool mc=true, TString lum="2.3", int corner=1, bool d
 		info_ds->SetY(0.83);
 	}
 	else if (corner == 1) {
-		info_ds->SetX(0.63);
+		info_ds->SetX(0.65);
 		if (not mc) info_ds->SetX(0.64);
 		info_ds->SetY(0.83);
 	}
