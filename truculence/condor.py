@@ -134,14 +134,14 @@ def unclean():
 	return True
 
 def tar_cmssw(indir="."):
-	if not clean(): return False
-	if not unclean(): return False
+#	if not clean(): return False
+#	if not unclean(): return False
 	try:
-		check_call("tar --exclude-caches-all -zcf " + indir + "/${CMSSW_VERSION}.tar.gz -C ${CMSSW_BASE}/.. ${CMSSW_VERSION}", shell=True)
+		check_call("tar --exclude-caches-all -czf " + indir + "/${CMSSW_VERSION}.tar.gz -C ${CMSSW_BASE}/.. ${CMSSW_VERSION}", shell=True)
 	except Exception as ex:
 		print ex
 		return False
-	if not clean(): return False
+#	if not clean(): return False
 	return True
 
 
