@@ -1,63 +1,143 @@
-vector<TLatex*> style_info(bool mc=true, TString lum="31.3", int corner=1, bool draw=true) {
-	// "CMS" word:
+TLatex* style_cms(int corner, bool pull=false) {
 	TLatex* info_cms = new TLatex(0, 0, "#bf{CMS}");
 	info_cms->SetNDC();		// Set text position to NDC coordinates.
-	info_cms->SetTextSize(0.06);
-	if (corner == 0) {
-		info_cms->SetX(0.21);
-		info_cms->SetY(0.87);
+//	info_cms->SetTextFont(42);
+//	info_cms->SetTextSize(0.06);
+	info_cms->SetTextFont(43);
+	info_cms->SetTextSize(58);
+	
+	if (!pull) {
+		if (corner == 0) {
+			info_cms->SetX(0.21);
+			info_cms->SetY(0.875);
+		}
+		else if (corner == 1) {
+			info_cms->SetX(0.68);
+			info_cms->SetY(0.875);
+		}
+		else if (corner == 2) {
+			info_cms->SetX(0.68);
+			info_cms->SetY(0.36);
+		}
+		else if (corner == 3) {
+			info_cms->SetX(0.21);
+			info_cms->SetY(0.36);
+		}
+		else if (corner == 4) {
+			info_cms->SetTextSize(40);
+			info_cms->SetX(0.285);
+			info_cms->SetY(0.94);
+		}
 	}
-	else if (corner == 1) {
-		info_cms->SetX(0.68);
-		info_cms->SetY(0.87);
-	}
-	else if (corner == 2) {
-		info_cms->SetX(0.68);
-		info_cms->SetY(0.37);
-	}
-	else if (corner == 4) {
-		info_cms->SetTextSize(0.05);
-		info_cms->SetX(0.27);
-		info_cms->SetY(0.945);
+	else {
+		if (corner == 0) {
+			info_cms->SetX(0.21);
+			info_cms->SetY(0.86);
+		}
+		else if (corner == 1) {
+			info_cms->SetX(0.68);
+			info_cms->SetY(0.86);
+		}
+		else if (corner == 2) {
+			info_cms->SetX(0.68);
+			info_cms->SetY(0.37);
+		}
+		else if (corner == 3) {
+			info_cms->SetX(0.21);
+			info_cms->SetY(0.37);
+		}
+		else if (corner == 4) {
+			info_cms->SetTextSize(40);
+			info_cms->SetX(0.285);
+			info_cms->SetY(0.945);
+		}
 	}
 	
-	// Dataset word:
+	return info_cms;
+}
+
+TLatex* style_lum(TString lum) {
+	TLatex* info_lum = new TLatex(0, 0, lum + " fb^{-1} #scale[0.7]{(#sqrt{#it{s}} = 13 TeV)}");
+	info_lum->SetNDC();
+	info_lum->SetTextFont(43);
+	info_lum->SetTextSize(30);
+//	info_lum->SetTextFont(42);
+//	info_lum->SetTextSize(0.04);
+	info_lum->SetX(0.58);
+	info_lum->SetY(0.94);
+	
+	return info_lum;
+}
+
+TLatex* style_ds_type(bool mc, int corner, bool pull) {
 	TString ds = TString("#it{simulation}");
 	if (not mc) ds = TString("#it{preliminary}");
 	TLatex* info_ds = new TLatex(0, 0, ds);
 	info_ds->SetNDC();
-	info_ds->SetTextSize(0.035);
-	if (corner == 0) {
-		info_ds->SetX(0.21);
-		info_ds->SetY(0.83);
+	info_ds->SetTextFont(43);
+	info_ds->SetTextSize(30);
+//	info_ds->SetTextFont(42);
+//	info_ds->SetTextSize(0.035);
+	if (!pull) {
+		if (corner == 0) {
+			info_ds->SetX(0.21);
+			info_ds->SetY(0.84);
+		}
+		else if (corner == 1) {
+			info_ds->SetX(0.67);
+			if (not mc) info_ds->SetX(0.66);
+			info_ds->SetY(0.84);
+		}
+		else if (corner == 2) {
+			info_ds->SetX(0.67);
+			if (not mc) info_ds->SetX(0.66);
+			info_ds->SetY(0.33);
+		}
+		else if (corner == 3) {
+			info_ds->SetX(0.21);
+			info_ds->SetY(0.33);
+		}
+		else if (corner == 4) {
+			info_ds->SetTextSize(25);
+			info_ds->SetX(0.38);
+			info_ds->SetY(0.94);
+		}
 	}
-	else if (corner == 1) {
-		info_ds->SetX(0.65);
-		if (not mc) info_ds->SetX(0.64);
-		info_ds->SetY(0.83);
-	}
-	else if (corner == 2) {
-		info_ds->SetX(0.64);
-		if (not mc) info_ds->SetX(0.62);
-		info_ds->SetY(0.33);
-	}
-	else if (corner == 4) {
-		info_ds->SetTextSize(0.025);
-		info_ds->SetX(0.38);
-		info_ds->SetY(0.945);
+	else {
+		if (corner == 0) {
+			info_ds->SetX(0.21);
+			info_ds->SetY(0.83);
+		}
+		else if (corner == 1) {
+			info_ds->SetX(0.65);
+			if (not mc) info_ds->SetX(0.658);
+			info_ds->SetY(0.815);
+		}
+		else if (corner == 2) {
+			info_ds->SetX(0.64);
+			if (not mc) info_ds->SetX(0.62);
+			info_ds->SetY(0.33);
+		}
+		else if (corner == 3) {
+			info_ds->SetX(0.21);
+			info_ds->SetY(0.33);
+		}
+		else if (corner == 4) {
+			info_ds->SetTextSize(25);
+			info_ds->SetX(0.38);
+			info_ds->SetY(0.94);
+		}
 	}
 	
-	// Luminosity information:
-	TLatex* info_lum = new TLatex(0, 0, lum + " fb^{-1} #scale[0.6]{(#sqrt{#it{s}} = 13 TeV)}");
-	info_lum->SetNDC();
-	info_lum->SetTextSize(0.04);
-	info_lum->SetX(0.54);
-	info_lum->SetY(0.945);
-	
+	return info_ds;
+}
+
+
+vector<TLatex*> style_info(bool mc=true, TString lum="37.7", int corner=1, bool pull=false, bool draw=true) {
 	vector<TLatex*> results;
-	results.push_back(info_cms);
-	results.push_back(info_ds);
-	results.push_back(info_lum);
+	results.push_back(style_cms(corner, pull));
+	results.push_back(style_ds_type(mc, corner, pull));
+	results.push_back(style_lum(lum));
 	
 	if (draw) {
 		for (int i = 0; i < results.size(); i++) results[i]->Draw();
@@ -66,14 +146,33 @@ vector<TLatex*> style_info(bool mc=true, TString lum="31.3", int corner=1, bool 
 	return results;
 }
 
-TLatex* style_write(TString text, double x=0.60, double y=0.75, bool draw=true) {
+
+TLatex* style_write(TString text, double x=0.60, double y=0.78, double size=0.03, bool draw=true) {
 	TLatex* ttext = new TLatex(0, 0, text);
 	ttext->SetNDC();		// Set text position to NDC coordinates.
 	ttext->SetX(x);
 	ttext->SetY(y);
-	ttext->SetTextSize(0.04);
+	ttext->SetTextFont(42);
+	ttext->SetTextSize(size);
 	if (draw) ttext->Draw();
 	return ttext;
+}
+
+TLatex* style_write(vector<TString> texts, double x=0.60, double y=0.78, double size=0.03, bool draw=true) {
+	TString text = texts[texts.size() - 1];
+	for (unsigned i = texts.size() - 1; i-- > 0;) {
+		text = "#splitline{" + texts[i] + "}{" + text + "}";
+	}
+	return style_write(text, x, y, size, draw);
+	
+//	TLatex* ttext = new TLatex(0, 0, text);
+//	ttext->SetNDC();		// Set text position to NDC coordinates.
+//	ttext->SetX(x);
+//	ttext->SetY(y);
+//	ttext->SetTextFont(42);
+//	ttext->SetTextSize(size);
+//	if (draw) ttext->Draw();
+//	return ttext;
 }
 
 

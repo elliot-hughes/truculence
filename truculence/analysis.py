@@ -79,12 +79,12 @@ def get_cmssw(parsed=True):
 #		"files": files,
 #	}
 
-def get_nevents(path="", tt_name="Events", site="cmslpc", v=False):
-	if not isinstance(path, list):
-		path = [path]
+def get_nevents(Dir, path="", tt_name="Events", v=False):
+	if not isinstance(path, list): path = [path]
 	
-	if site == "cmslpc":
-		path = ["root://cmsxrootd.fnal.gov/" + p if "/store/user/" in p and "root:" not in p else p for p in path]
+#	if site == "cmslpc":
+#		path = ["root://cmsxrootd.fnal.gov/" + p if "/store/user/" in p and "root:" not in p else p for p in path]
+	if Dir.eos: path = ["root://{}/{}".format(Dir.url_eos, p)]# if "/store/user/" in p and "root:" not in p else p for p in path]
 	
 #	print path
 	nevents = root.tc_nevents(root.make_tc(path, name=tt_name))

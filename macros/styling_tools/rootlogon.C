@@ -1,6 +1,8 @@
 {
-	const float FONTSIZE = 0.06;
-	const int FONT = 42;		// "4" is Helvetica ("5" is Helvetica italic), "2" is the precision (font size scales with pad).
+	const int FONTSCALE = 42;		// "4" is Helvetica ("5" is Helvetica italic), "2" is the precision (font size scales with pad).
+	const float FONTSCALESIZE = 0.06;
+	const int FONT = 43;		// "4" is Helvetica ("5" is Helvetica italic), "3" is the precision (font size is fixed in pixels).
+	const float FONTSIZE = 50;
 	
 	gROOT->SetStyle("Plain");
 	
@@ -44,8 +46,8 @@
 	gStyle->SetTitleSize(FONTSIZE, "x");
 	gStyle->SetTitleSize(FONTSIZE, "y");
 	gStyle->SetLabelFont(FONT, "xyz");
-	gStyle->SetLabelSize(0.05, "xyz");
-	gStyle->SetLabelSize(0.04, "z");
+	gStyle->SetLabelSize(FONTSIZE*0.83, "xyz");
+	gStyle->SetLabelSize(FONTSIZE*0.67, "z");
 	/// Plot titles:
 	gStyle->SetTitleBorderSize(0);
 //	gStyle->SetTitleColor(1);
@@ -54,7 +56,7 @@
 	gStyle->SetTitleY(0.99);
 	gStyle->SetTitleW(0.5);
 	gStyle->SetTitleH(0.0);
-	gStyle->SetTitleFontSize(0.05);
+	gStyle->SetTitleFontSize(FONTSCALESIZE*0.83);
 //	gStyle->SetTitleY(1.0);
 //	gStyle->SetTitleX(FONTSIZE);
 	
@@ -62,13 +64,13 @@
 	gStyle->SetLabelOffset(0.015, "x");
 	gStyle->SetLabelOffset(0.007, "yz");
 	gStyle->SetTitleOffset(1.25, "x");
-	gStyle->SetTitleOffset(1.4, "y");
+	gStyle->SetTitleOffset(1.6, "y");
 	gStyle->SetTitleOffset(1.6, "z");
 	
 	// Statbox:
 	gStyle->SetOptStat(1111110);		// "ksiourmen" (right-to-left)
-	gStyle->SetStatFont(FONT);
-	gStyle->SetStatFontSize(0.040);
+	gStyle->SetStatFont(FONTSCALE);
+	gStyle->SetStatFontSize(FONTSCALESIZE*0.67);
 	gStyle->SetStatX(0.80);
 	gStyle->SetStatY(0.80);
 	gStyle->SetStatW(0.30);
