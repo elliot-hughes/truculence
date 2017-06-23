@@ -48,14 +48,16 @@ def main():
 		iseed = int(info_card_run["iseed"][0])
 		nevents_exp = int(info_card_run["nevents"][0])
 		ihtmin = float(info_card_run["ihtmin"][0])
-		
+		ptheavy = float(info_card_run["ptheavy"][0])
+
 		# Print information:
 		fname = f.split("/")[-1]
 		print "Information for {}:".format(fname)
 		print "\tEvents: {}{}".format(nevents, " ({} expected!)".format(nevents_exp) if nevents_exp != nevents else "")
 		print "\tiseed: {}".format(iseed)
 		print "\tihtmin: {} GeV".format(ihtmin)
-		
+		print "\tptheavy: {} GeV".format(ptheavy)		
+
 		return True
 	else:
 		print "ERROR: There's no file called '{}'".format(f)

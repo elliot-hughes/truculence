@@ -5,6 +5,7 @@
 ####################################################################
 
 # IMPORTS:
+import os, sys
 from subprocess import check_call
 from ROOT import TFile, TChain, SetOwnership
 # /IMPORTS
@@ -99,11 +100,23 @@ def tc_nevents(tc):
 def hadd(out_file, in_files, n=500):
 	# n: maximum number of files per group.
 	assert(isinstance(in_files, list))
-#	while not stop:
-	groups = [in_files[i:i+n] for i in range(0, len(in_files), n)]
-	temp_files = []
-	for i, group in enumerate(groups):
-		check_call("hadd -f -n 50 {} {}".format("temp_anatuple_{}.root".format(i), " ".join(group)), shell=True)
+	count = 0
+	while len(in_files) > 1:
+		groups = [in_files[i:i+n] for i in range(0, len(in_files), n)]
+		temp_files = []
+		for i, group in enumerate(groups):
+			file_name = "{}_{}_{}.root".format(out_file, count, i)
+			try:
+				check_call("hadd -f -n 50 {} {}".format(file_name, " ".join(group)), shell=True)
+			except Exception as ex:
+				print ex
+				sys.exit()
+			else:
+				temp_files.append(file_name)
+		if count > 0:
+			for f in in_files: os.remove(f)
+		in_files = temp_files
+		count += 1
 
 
 

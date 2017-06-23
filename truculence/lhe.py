@@ -86,6 +86,8 @@ class event:
 				self.particles.append(particle)
 			self.quarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(-6, 0) + range(1, 7)]
 			self.squarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(1000001, 1000007)]
+			self.gluinos = [particle for particle in self.particles if abs(particle["pdgid"]) == 1000021]
+			self.higgsinos = [particle for particle in self.particles if abs(particle["pdgid"]) == 1000022]  
 			self.ht = sum([quark["pt"] for quark in self.quarks])
 		else:
 			self.raw = False
