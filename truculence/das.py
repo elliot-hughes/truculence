@@ -47,6 +47,7 @@ def get_info(name, instance="global", valid=True):
 			filename = ""
 			for entry in f["file"]:
 				if "nevents" in entry:
+#					print entry
 					results["ns"].append(entry["nevents"])
 					results["files"].append(entry["name"])
 					break

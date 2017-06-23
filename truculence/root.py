@@ -23,6 +23,9 @@ class rfile:
 		tlist = self.tf.GetListOfKeys()
 		return [item.GetName() for item in tlist]
 	
+	def get_tobject(self, name):
+		return self.tf.Get(name)
+	
 	def get_tobjects(self, kind=""):
 		names = self.ls()
 		tobjects = [self.tf.Get(name) for name in names]
