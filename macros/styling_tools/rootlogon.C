@@ -43,8 +43,8 @@
 	gStyle->SetTextSize(FONTSIZE);
 	gStyle->SetTitleFont(FONT, "xyz");
 	gStyle->SetTitleFont(FONT, "bla");
-	gStyle->SetTitleSize(FONTSIZE, "x");
-	gStyle->SetTitleSize(FONTSIZE, "y");
+	gStyle->SetTitleSize(FONTSIZE, "xy");
+	gStyle->SetTitleSize(FONTSIZE*0.87, "z");
 	gStyle->SetLabelFont(FONT, "xyz");
 	gStyle->SetLabelSize(FONTSIZE*0.83, "xyz");
 	gStyle->SetLabelSize(FONTSIZE*0.67, "z");
