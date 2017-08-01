@@ -84,9 +84,8 @@ def get_nevents(Dir, path="", tt_name="Events", v=False):
 	
 #	if site == "cmslpc":
 #		path = ["root://cmsxrootd.fnal.gov/" + p if "/store/user/" in p and "root:" not in p else p for p in path]
-	if Dir.eos: path = ["root://{}/{}".format(Dir.url_eos, p)]# if "/store/user/" in p and "root:" not in p else p for p in path]
+	if Dir.eos: path = ["root://{}/{}".format(Dir.url_eos, p) for p in path]# if "/store/user/" in p and "root:" not in p else p for p in path]
 	
-#	print path
 	nevents = root.tc_nevents(root.make_tc(path, name=tt_name))
 	return nevents
 #	return sum(nevents)
