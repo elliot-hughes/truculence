@@ -102,13 +102,15 @@ class event:
 
 
 # FUNCTIONS:
-def get_info(f):
+def get_info(f, v=False):
+	if v: print "[..] Getting info for {}".format(f)
 	if os.path.exists(f):
 		info = {}
 		tree = ET.parse(f)
 		info["nevents"] = len(tree.findall("event"))
 		return info
 	else:
+		if v: print "[!!] File doesn't exist."
 		return False
 
 
