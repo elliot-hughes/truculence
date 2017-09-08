@@ -81,7 +81,8 @@ def check_stderr_logs(indir, logs_stderr=None):
 	results = {}
 	for l in logs_stderr:
 		path = indir + "/logs/" + l
-		match = re.search("[a-zA-Z0-9_]+_(\d+).stderr", l)
+		match = re.search("[a-zA-Z0-9_]+_job(\d+)_[a-zA-Z0-9_]+.stderr", l)
+		if not match: match = re.search("[a-zA-Z0-9_]+_(\d+).stderr", l)
 		njob = int(match.group(1))
 		
 		stderr_analysis = analyze_log_stderr(path)
@@ -148,6 +149,13 @@ def tar_cmssw(indir="."):
 def submit_jobs(indir, n_jobs, prefix):
 	os.chdir(indir)
 	jlist = ["{}_{}.jdl".format(prefix, n) for n in n_jobs]
+	FNULL = open(os.devnull, 'w')
+	for j in jlist:
+		Popen(["condor_submit", j], stdout=FNULL, stderr=STDOUT)
+
+def submit_jobs_by_name(indir, job_files):
+	os.chdir(indir)
+	jlist = job_files
 	FNULL = open(os.devnull, 'w')
 	for j in jlist:
 		Popen(["condor_submit", j], stdout=FNULL, stderr=STDOUT)
