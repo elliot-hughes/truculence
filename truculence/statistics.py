@@ -5,6 +5,7 @@
 ####################################################################
 
 # IMPORTS:
+from copy import copy
 # :IMPORTS
 
 # CLASSES:
@@ -19,7 +20,7 @@
 #		for value in row:
 
 def cov_to_cor(cov):
-	cor = cov
+	cor = copy(cov)
 	for i, row in enumerate(cov):
 		for j, value in enumerate(row):
 			cor[i][j] = cov[i][j]/(cov[i][i]*cov[j][j])**(0.5)

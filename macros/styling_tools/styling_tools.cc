@@ -133,11 +133,13 @@ TLatex* style_ds_type(bool mc, int corner, bool pull) {
 }
 
 
-vector<TLatex*> style_info(bool mc=true, TString lum="38.2", int corner=1, bool pull=false, bool draw=true) {
+vector<TLatex*> style_info(bool mc=true, TString lum="38.2", int corner=1, bool pull=false, double lumx=0.58, bool draw=true) {
 	vector<TLatex*> results;
 	results.push_back(style_cms(corner, pull));
 	results.push_back(style_ds_type(mc, corner, pull));
-	results.push_back(style_lum(lum));
+	TLatex* lum_words = style_lum(lum);
+	lum_words->SetX(lumx);
+	results.push_back(lum_words);
 	
 	if (draw) {
 		for (int i = 0; i < results.size(); i++) results[i]->Draw();

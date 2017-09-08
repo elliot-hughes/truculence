@@ -102,7 +102,7 @@ class event:
 
 
 # FUNCTIONS:
-def get_info(f, v=False):
+def get_info(f, v=True):
 	if v: print "[..] Getting info for {}".format(f)
 	if os.path.exists(f):
 		info = {}
