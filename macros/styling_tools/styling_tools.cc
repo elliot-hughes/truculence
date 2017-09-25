@@ -109,7 +109,7 @@ TLatex* style_ds_type(bool mc, int corner, bool pull) {
 			info_ds->SetY(0.83);
 		}
 		else if (corner == 1) {
-			info_ds->SetX(0.65);
+			info_ds->SetX(0.67);
 			if (not mc) info_ds->SetX(0.658);
 			info_ds->SetY(0.815);
 		}
