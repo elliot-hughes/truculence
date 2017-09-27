@@ -1,3 +1,5 @@
+#include "legend.cc"
+
 TLatex* style_cms(int corner, bool pull=false) {
 	TLatex* info_cms = new TLatex(0, 0, "#bf{CMS}");
 	info_cms->SetNDC();		// Set text position to NDC coordinates.
