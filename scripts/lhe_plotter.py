@@ -9,16 +9,27 @@ import ROOT
 #lhe_in = "/users/h2/tote/madgraph/sqto4j/Events/sq150to4j_cutht700/unweighted_events.lhe"
 #lhe_in = "out.lhe"
 ROOT.gROOT.SetBatch()
-tf_out = ROOT.TFile("lhe_plots.root","recreate")
 #ptc = ROOT.TCanvas("pt", "pt")
 #htc = ROOT.TCanvas("ht", "ht") 
 #msc = ROOT.TCanvas("ms", "ms")
-th1_pt = ROOT.TH1D("pt", "pt", 50, 0, 1000)
-th1_ht = ROOT.TH1D("ht", "ht", 50, 0, 2000)
-th1_gms = ROOT.TH1D("gluino mass", "gluino mass", 50, 0, 2000)
-th1_hms = ROOT.TH1D("higgsino mass", "higgsino mass", 50, 0, 2000) 
 
 # FUNCTIONS:
+def construct_histograms():
+	hs = {}
+	
+	hs["ht"] = ROOT.TH1D("ht", "", 50, 0, 2000)
+	hs["pt_sg"] = ROOT.TH1D("pt_sg", "", 50, 0, 1000)
+	hs["pt_sq"] = ROOT.TH1D("pt_sq", "", 50, 0, 1000)
+	hs["pt_t"] = ROOT.TH1D("pt_t", "", 50, 0, 1000)
+	hs["m_sg"] = ROOT.TH1D("m_sg", "", 50, 0, 1000)
+	hs["m_sq"] = ROOT.TH1D("m_sq", "", 50, 0, 1000)
+	hs["m_t"] = ROOT.TH1D("m_t", "", 50, 0, 1000)
+	hs["m_sh"] = ROOT.TH1D("m_sh", "", 50, 0, 1000)
+	hs["eta_sq"] = ROOT.TH1D("eta_sq", "", 50, -6, 6)
+	hs["eta_t"] = ROOT.TH1D("eta_t", "", 50, -6, 6)
+	
+	return hs
+
 def main():
 	# Arguments and variables:
 	assert len(sys.argv) == 2
@@ -28,118 +39,52 @@ def main():
 	if not os.path.exists(lhe_in):
 		print "ERROR: There's no file called '{}'".format(lhe_in)
 		return False
+		
+	tf_out = ROOT.TFile(fname.replace(".lhe", "") + ".root", "recreate")
+	
+	hs = construct_histograms()
 
 	n_total = 0
 	n_passed_ht = 0
 	n_passed_pt = 0
+	n_odd_squark_count = 0
 	tree = ET.parse(lhe_in)
 	for i, event in enumerate(tree.findall("event")):
 		e = lhe.event(event)
-		pts = [gluino["pt"] for gluino in e.gluinos]                                                                                         
-		gmss = [gmass["m"] for gmass in e.gluinos] 
-		hmss = [hmass["m"] for hmass in e.higgsinos]
+		if len(e.squarks) > 2:
+			if n_odd_squark_count == 0: 
+				print "Event {}:".format(i)
+				print e.raw
+			n_odd_squark_count += 1
+		pts_sg = [sg["pt"] for sg in e.gluinos]
+		pts_sq = [sq["pt"] for sq in e.squarks]
+		pts_t = [q["pt"] for q in e.tops]
+		ms_sg = [sg["m"] for sg in e.gluinos]
+		ms_sq = [sq["m"] for sq in e.squarks]
+		ms_t = [q["m"] for q in e.tops]
+		ms_sh = [sh["m"] for sh in e.higgsinos]
+		etas_sq = [sq["eta"] for sq in e.squarks]
+		etas_t = [q["eta"] for q in e.tops]
 		ht = e.ht
-		for pt in pts: th1_pt.Fill(pt)
-		for m in gmss: th1_gms.Fill(m)
-		for m in hmss: th1_hms.Fill(m)
-		th1_ht.Fill(ht)
-
-	#ptc.cd()	
-	#th1_pt.Draw()
-	#htc.cd()
-	#th1_ht.Draw() 
-	#msc.cd()
-        #th1_ms.Draw()
-	
-	tf_out.WriteTObject(th1_pt)
-	tf_out.WriteTObject(th1_ht) 
-	tf_out.WriteTObject(th1_gms) 
-	tf_out.WriteTObject(th1_hms)
-	
-	
-
-
-
-
-
-
-
-
-	
-	
-	
-	
-	
-	
-# 	sys.exit()
-	
-# 	n_inits = 0
-# 	n_events = 0
-# 	n_events_accepted = 0
-
-# 	tags = ["event", "init"]
-# 	controls = {}
-# 	raws = {}
-# 	for tag in tags:
-# 		controls[tag] = {}
-# 		controls[tag]["begin"] = False
-# 		controls[tag]["end"] = False
-# 		controls[tag]["inside"] = False
-# 		raws[tag] = ""
-	
-# 	# Start looping over the input file:
-# 	with open(lhe_in, "r") as file_in:
-# 		for line in file_in:                 # This method is good on memory, acting as an iterator.
-# 	#		print line
-# 			for tag, control in controls.iteritems():     # Tag is "event" or "init".
-# 				if "<{}>".format(tag) in line:
-# 					control["begin"] = True
-# 					control["inside"] = True
-# 				else:
-# 					control["begin"] = False
-# 				if "</{}>".format(tag) in line:
-# 					control["end"] = True
-# 					control["inside"] = False
-# 				else:
-# 					control["end"] = False
 		
-# 				if control["begin"]:
-# 					raws[tag] = line
-# 				elif control["inside"] or control["end"]:
-# 					raws[tag] += line
-		
-# 			if controls["init"]["end"]:
-# 				init = lhe.init(raws["init"])
-# 				if init:
-# 					if n_inits == 0:
-# 						n_inits += 1
-# #						with open(lhe_out, "a") as file_out:
-# #							file_out.write(init.raw + "\n")
-# 					else:
-# 						print "ERROR: There is more than one \"init\" in the LHE file."
-# 						sys.exit()
-		
-# 			if controls["event"]["end"]:
-# 				event = lhe.event(raws["event"])
-# 				if event:
-# 					n_events += 1
-# 					pts = [squark["pt"] for squark in event.squarks]
-# 					ht = sum([quark["pt"] for quark in event.quarks])
-# 					for pt in pts:
-# 						th1_pt.Fill(pt)
-# 					th1_ht.Fill(ht)
+		hs["ht"].Fill(ht)
+		for pt in pts_sg: hs["pt_sg"].Fill(pt)
+		for pt in pts_sq: hs["pt_sq"].Fill(pt)
+		for pt in pts_t: hs["pt_t"].Fill(pt)
+		for m in ms_sg: hs["m_sg"].Fill(m)
+		for m in ms_sq: hs["m_sq"].Fill(m)
+		for m in ms_t: hs["m_t"].Fill(m)
+		for m in ms_sh: hs["m_sh"].Fill(m)
+		for eta in etas_sq: hs["eta_sq"].Fill(eta)
+		for eta in etas_t: hs["eta_t"].Fill(eta)
 	
-# 	tc.SetLogy(1)
-# 	th1_pt.Draw()
-# 	tc.SaveAs("{}.pdf".format(th1_pt.GetName()))
-# 	tc.Clear()
-# 	th1_ht.Draw()
-# 	tc.SaveAs("{}.pdf".format(th1_ht.GetName()))
+	for name, h in hs.items(): tf_out.WriteTObject(h)
 	
-# 	print n_inits, n_events
-# # :FUNCTIONS
+	print "Odd squark count = {}".format(n_odd_squark_count)
 
-## MAIN:
+# :FUNCTIONS
+
+# MAIN:
 if __name__ == "__main__":
 	main()
-## :MAIN
+# :MAIN

@@ -3,6 +3,7 @@ import os, re
 import xml.etree.ElementTree as ET
 #from xml.etree.ElementTree import Element
 import utilities
+import math
 # :IMPORTS
 
 
@@ -81,11 +82,15 @@ class event:
 				particle["px"] = particle["p"][1]
 				particle["py"] = particle["p"][2]
 				particle["pz"] = particle["p"][3]
+				particle["P"] = (particle["px"]**2 + particle["py"]**2 + particle["pz"]**2)**(0.5)
 				particle["pt"] = (particle["px"]**2 + particle["py"]**2)**(0.5)
 				particle["m"] = float(pieces[10])
+				try: particle["eta"] = 0.5*math.log((particle["P"] + particle["pz"])/(particle["P"] - particle["pz"]))
+				except: particle["eta"] = 1000
 				self.particles.append(particle)
-			self.quarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(-6, 0) + range(1, 7)]
-			self.squarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(1000001, 1000007)]
+			self.tops = [particle for particle in self.particles if abs(particle["pdgid"]) == 6]
+			self.quarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(1, 6)]		# Excludes tops
+			self.squarks = [particle for particle in self.particles if abs(particle["pdgid"]) in range(1000001, 1000007) + range(2000001, 2000007)]
 			self.gluinos = [particle for particle in self.particles if abs(particle["pdgid"]) == 1000021]
 			self.higgsinos = [particle for particle in self.particles if abs(particle["pdgid"]) == 1000022]  
 			self.ht = sum([quark["pt"] for quark in self.quarks])
